@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 SupabaseClient supaClient = Supabase.instance.client;
 
 class SupabaseAuthUi {
-  Future<Supabase> initSupabase(String url, String anonKey) async {
+  Future<Supabase> initSupabase(String url, String anonKey) {
     return Supabase.initialize(
       url: url,
       anonKey: anonKey,
@@ -13,9 +13,11 @@ class SupabaseAuthUi {
   /// Email-password sign up
   Future<GotrueSessionResponse> createNewEmailUser(
     String email,
-    String password,
-  ) {
-    return supaClient.auth.signUp(email, password);
+    String password, {
+    AuthOptions? options,
+    Map<String, dynamic>? userMetadata,
+  }) {
+    return supaClient.auth.signUp(email, password, options: options, userMetadata: userMetadata);
   }
 
   /// Email-password sign in
@@ -73,8 +75,7 @@ class SupabaseAuthUi {
     String? redirectUrl,
   ]) {
     final provider = Provider.values.byName(socialProvider);
-    return supaClient.auth.signInWithProvider(provider,
-        options: AuthOptions(redirectTo: redirectUrl));
+    return supaClient.auth.signInWithProvider(provider, options: AuthOptions(redirectTo: redirectUrl));
   }
 
   /// Sign out active user

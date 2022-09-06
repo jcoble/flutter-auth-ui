@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
@@ -10,8 +12,7 @@ class SupaEmailAuth extends StatefulWidget {
   final AuthAction authAction;
   final String? redirectUrl;
 
-  const SupaEmailAuth({Key? key, required this.authAction, this.redirectUrl})
-      : super(key: key);
+  const SupaEmailAuth({Key? key, required this.authAction, this.redirectUrl}) : super(key: key);
 
   @override
   State<SupaEmailAuth> createState() => _SupaEmailAuthState();
@@ -43,9 +44,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
         children: [
           TextFormField(
             validator: (value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  !EmailValidator.validate(_email.text)) {
+              if (value == null || value.isEmpty || !EmailValidator.validate(_email.text)) {
                 return 'Please enter a valid email address';
               }
               return null;
@@ -83,14 +82,13 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
               }
               if (isSigningIn) {
                 try {
-                  await _supaAuth.signInExistingUser(
-                      _email.text, _password.text);
+                  await _supaAuth.signInExistingUser(_email.text, _password.text);
                   if (!mounted) return;
-                  await successAlert(context);
-                  if (mounted) {
-                    Navigator.popAndPushNamed(
-                        context, widget.redirectUrl ?? '/');
-                  }
+                  // await successAlert(context);
+                  // if (mounted) {
+                  //   Navigator.popAndPushNamed(
+                  //       context, widget.redirectUrl ?? '/');
+                  // }
                 } on GoTrueException catch (error) {
                   await warningAlert(context, error.message);
                 } catch (error) {
@@ -98,14 +96,17 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                 }
               } else {
                 try {
-                  await _supaAuth.createNewEmailUser(
-                      _email.text, _password.text);
+                  var userMetadata = {'username': _email.text};
+                  final options = AuthOptions(redirectTo: widget.redirectUrl);
+
+                  await _supaAuth.createNewEmailUser(_email.text, _password.text,
+                      options: options, userMetadata: userMetadata);
                   if (!mounted) return;
-                  await successAlert(context);
-                  if (mounted) {
-                    Navigator.popAndPushNamed(
-                        context, widget.redirectUrl ?? '/');
-                  }
+                  // await successAlert(context);
+                  // if (mounted) {
+                  //   Navigator.popAndPushNamed(
+                  //       context, widget.redirectUrl ?? '/');
+                  // }
                 } on GoTrueException catch (error) {
                   await warningAlert(context, error.message);
                 } catch (error) {
